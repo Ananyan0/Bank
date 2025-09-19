@@ -8,9 +8,10 @@ namespace Bank.Infrastructure.Repositories;
 public class AccountRepository : Repository<Account>, IAccountRepository
 {
 
-    public AccountRepository(AppDbContext context) : base(context) 
-    { 
+    public AccountRepository(AppDbContext context) : base(context)
+    {
     }
+
 
     //public async Task AddAsync(Account account)
     //{

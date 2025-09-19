@@ -14,19 +14,38 @@ namespace Bank.Infrastructure.Repositories
         private readonly AppDbContext _context;
         private readonly Lazy<ICustomerRepository> _customerRepository;
         private readonly Lazy<IAccountRepository> _accountRepository;
+        private readonly Lazy<ITransactionRepository> _transactionRepository;
+        private readonly Lazy<ICustomerProfileRepository> _customerprofileRepository;
+        private readonly Lazy<IBranchRepository> _branchRepository;
+        private readonly Lazy<ICustomerBranchRepository> _customerBranchRepository;
 
-        public UnitOfWork(AppDbContext context, Lazy<ICustomerRepository> customerRepository, Lazy<IAccountRepository> accountRepository)
+
+        public UnitOfWork(AppDbContext context, Lazy<ICustomerRepository> customerRepository, Lazy<IAccountRepository> accountRepository, Lazy<ITransactionRepository> transactionRepository, Lazy<ICustomerProfileRepository> customerprofileRepository, Lazy<IBranchRepository> branchRepository, Lazy<ICustomerBranchRepository> customerBranchRepository)
         {
             _context = context;
 
             _customerRepository = customerRepository;
             _accountRepository = accountRepository;
+            _transactionRepository = transactionRepository;
+            _customerprofileRepository = customerprofileRepository;
+            _branchRepository = branchRepository;
+            _customerBranchRepository = customerBranchRepository;
         }
 
         public ICustomerRepository Customers => _customerRepository.Value;
         public IAccountRepository Accounts => _accountRepository.Value; 
-        
+        public ITransactionRepository Transactions => _transactionRepository.Value;
+        public ICustomerProfileRepository CustomerProfiles => _customerprofileRepository.Value;
+        public IBranchRepository Branches => _branchRepository.Value;
+        public ICustomerBranchRepository CustomerBranches => _customerBranchRepository.Value;
+
+
         public async Task<int> SaveChangesAsync()
+        {
+            return await _context.SaveChangesAsync();
+        }
+
+        public async Task<int> CompleteAsync() // ✅ implements IUnitOfWork
         {
             return await _context.SaveChangesAsync();
         }

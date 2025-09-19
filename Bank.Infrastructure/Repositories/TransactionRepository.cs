@@ -7,18 +7,18 @@ namespace Bank.Infrastructure.Repositories;
 
 public class TransactionRepository : Repository<Transaction>, ITransactionRepository
 {
-    private readonly AppDbContext _context;
 
     public TransactionRepository(AppDbContext context) : base(context)
     {
-        _context = context;
     }
 
 
-    public async Task<IEnumerable<Transaction>> GetByAccountIdAsync(int accountId)
+    public async Task<List<Transaction>> GetByAccountIdAsync(int accountId)
     {
-        return await _context.Transactions
-                             .Where(t => t.AccountId == accountId)
-                             .ToListAsync();
+        var query =  _context.Transactions
+                             .Where(t => t.AccountId == accountId || t.TargetAccountId == accountId);
+        query = query.Include(t => t.Account)
+                     .Include(t => t.TargetAccount);
+        return await query.ToListAsync();
     }
 }

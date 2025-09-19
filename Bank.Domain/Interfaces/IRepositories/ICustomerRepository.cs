@@ -1,12 +1,9 @@
 ﻿using Bank.Domain.Entities;
+using System.Linq.Expressions;
 
 namespace Bank.Domain.Interfaces.IRepositories;
 
-public interface ICustomerRepository
+public interface ICustomerRepository : IRepository<Customer>
 {
-    Task<Customer?> GetByIdAsync(int id);
-    Task AddAsync(Customer customer);
-    Task<List<Customer>> GetAllAsync();
-    Task DeleteAsync(Customer customer);
-
+    Task<Customer?> GetWithProfileAsync(int id);
 }

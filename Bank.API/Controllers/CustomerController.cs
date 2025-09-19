@@ -1,6 +1,7 @@
 ﻿using Bank.Application.DTOs;
+using Bank.Application.DTOs.ResponseDTOs;
+using Bank.Application.Interfaces.IServices;
 using Bank.Domain.Entities;
-using Bank.Domain.Interfaces.IServices;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Bank.API.Controllers;
@@ -16,7 +17,7 @@ public class CustomerController : ControllerBase
         _customerService = CustomerService;
     }
 
-    [HttpPost] 
+    [HttpPost]
     public async Task<IActionResult> CreateCustomerAsync([FromForm] CreateCustomerRequest request)
     {
         var customerId = await _customerService.CreateCustomerAsync(
@@ -27,8 +28,6 @@ public class CustomerController : ControllerBase
 
         return Ok(new { CustomerId = customerId });
     }
-
-
 
 
 
@@ -54,17 +53,37 @@ public class CustomerController : ControllerBase
         return Ok(customer);
     }
 
+    [HttpGet("{id}/with-profile")]
+    public async Task<ActionResult<CustomerWithProfileResponse>> GetCustomerWithProfile(int id)
+    {
+        var customer = await _customerService.GetCustomerWithProfileAsync(id);
+        if (customer == null)
+            return NotFound();
+
+        return Ok(customer);
+    }
+
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteCustomer(int id)
     {
-        try
-        {
-            await _customerService.DeleteCustomerAsync(id);
-            return NoContent();
-        }
-        catch (Exception ex)
-        {
-            return NotFound(new { message = ex.Message });
-        }
+        await _customerService.DeleteCustomerAsync(id);
+        return Ok("success");
     }
+
+    [HttpPut("{id}")]
+    public async Task<IActionResult> UpdateCustomer(int id, [FromForm] CustomerUpdateDTO dto)
+    {
+        var customer = await _customerService.GetByIdAsync(id);
+        if (customer == null) return NotFound();
+
+        customer.Name = dto.Name;
+        customer.Email = dto.Email;
+        customer.PhoneNumber = dto.Phone;
+
+        await _customerService.UpdateAsync(customer);
+
+        return Ok("success");
+    }
+
+
 }

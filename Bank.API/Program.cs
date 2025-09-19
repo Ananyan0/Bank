@@ -1,12 +1,12 @@
+using Bank.Application.Interfaces.IServices;
 using Bank.Application.Services;
 using Bank.Domain.Interfaces.IRepositories;
-using Bank.Domain.Interfaces.IServices;
 using Bank.Infrastructure.Data;
 using Bank.Infrastructure.Helpers;
 using Bank.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
 using IAccountRepository = Bank.Domain.Interfaces.IRepositories.IAccountRepository;
-using IAccountService = Bank.Domain.Interfaces.IServices.IAccountService;
+using IAccountService = Bank.Application.Interfaces.IServices.IAccountService;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,8 +20,11 @@ builder.Services.AddSwaggerGen();
 
 
 
+//builder.Services.AddDbContext<AppDbContext>(options =>
+//    options.UseInMemoryDatabase("BankDB"));
+
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseInMemoryDatabase("BankDB"));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
 builder.Services.AddScoped<ICustomerService, CustomerService>();
@@ -30,6 +33,19 @@ builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<ITransactionRepository, TransactionRepository>();
 builder.Services.AddScoped<ITransactionService, TransactionService>();
+builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
+builder.Services.AddScoped<IAccountRepository, AccountRepository>();
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
+builder.Services.AddScoped<ICustomerProfileRepository, CustomerProfileRepository>();
+builder.Services.AddScoped<IAccountRepository, AccountRepository>();
+builder.Services.AddScoped<ICustomerProfileService, CustomerProfileService>();
+
+builder.Services.AddScoped<IBranchRepository, BranchRepository>();
+builder.Services.AddScoped<ICustomerBranchRepository, CustomerBranchRepository>();
+builder.Services.AddScoped<ICustomerBranchService, CustomerBranchService>();
+
 
 builder.Services.AddScoped(typeof(Lazy<>), typeof(LazyService<>));
 

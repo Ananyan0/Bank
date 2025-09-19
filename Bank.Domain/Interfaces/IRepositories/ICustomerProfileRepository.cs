@@ -2,8 +2,6 @@
 
 namespace Bank.Domain.Interfaces.IRepositories;
 
-
-    public interface IAccountRepository : IRepository<Account>
+public interface ICustomerProfileRepository : IRepository<CustomerProfile>
 {
 }
-

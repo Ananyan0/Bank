@@ -1,6 +1,4 @@
-﻿using Bank.Application.DTOs;
-using Bank.Domain.Entities;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
 public record CreateCustomerRequest
@@ -13,5 +11,5 @@ public record CreateCustomerRequest
     public string Email { get; set; } = default!;
 
     [DefaultValue("")]
-    public string Phone { get; set; } = default!;
+    public string? Phone { get; set; }
 }

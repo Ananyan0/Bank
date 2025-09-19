@@ -1,6 +1,6 @@
 ﻿using Bank.Domain.Entities;
 
-namespace Bank.Domain.Interfaces.IServices;
+namespace Bank.Application.Interfaces.IServices;
 
 public interface IAccountService
 {

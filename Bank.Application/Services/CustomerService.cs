@@ -1,7 +1,9 @@
-﻿using Bank.Domain.Entities;
+﻿using Bank.Application.DTOs;
+using Bank.Application.DTOs.ResponseDTO;
+using Bank.Application.DTOs.ResponseDTOs;
+using Bank.Application.Interfaces.IServices;
+using Bank.Domain.Entities;
 using Bank.Domain.Interfaces.IRepositories;
-using Bank.Domain.Interfaces.IServices;
-using IAccountRepository = Bank.Domain.Interfaces.IRepositories.IAccountRepository;
 
 namespace Bank.Application.Services;
 
@@ -14,26 +16,7 @@ public class CustomerService : ICustomerService
         _unitOfWork = unitOfWork;
     }
 
-    /*    public async Task<int> CreateCustomerAsync(string customerName)
-        {
-            var customer = new Customer();
-            customer.Name = customerName;
-            await _customerRepository.AddAsync(customer);
-            return customer.Id;
-        }*/
-
-    /*    public async Task<int> CreateCustomerWithAccountAsync(string customerName, decimal initialBalance)
-        {
-            var customer = new Customer { Name = customerName };
-            await _customerRepository.AddAsync(customer);
-
-            var account = new Account { Balance = initialBalance, CustomerId = customer.Id };
-            await _accountRepository.AddAsync(account);
-
-            return customer.Id;
-        }*/
-
-    public async Task<int> CreateCustomerAsync(string name, string email, string phone)
+    public async Task<int> CreateCustomerAsync(string name, string email, string? phone)
     {
         var customer = new Customer
         {
@@ -62,7 +45,6 @@ public class CustomerService : ICustomerService
     }
 
 
-
     public async Task<Customer?> GetByIdAsync(int id)
     {
         return await _unitOfWork.Customers.GetByIdAsync(id);
@@ -70,10 +52,10 @@ public class CustomerService : ICustomerService
 
     public async Task<List<Customer>> GetCustomersWithAccountsAsync()
     {
-        var customers = await _unitOfWork.Customers.GetAllAsync();
+        var customers = await _unitOfWork.Customers.GetAllWithIncludeAsync(c => c.Accounts);
 
         return customers
-            .Where(c => c.Accounts != null && c.Accounts.Any())
+            .Where(c => c.Accounts.Any())
             .Select(c => new Customer
             {
                 Id = c.Id,
@@ -90,6 +72,7 @@ public class CustomerService : ICustomerService
             .ToList();
     }
 
+
     public async Task DeleteCustomerAsync(int customerId)
     {
         var customer = await _unitOfWork.Customers.GetByIdAsync(customerId);
@@ -102,5 +85,49 @@ public class CustomerService : ICustomerService
         }
 
         await _unitOfWork.Customers.DeleteAsync(customer);
+    }
+
+
+    public async Task UpdateCustomerFromDtoAsync(int id, CustomerUpdateDTO dto)
+    {
+        var customer = await _unitOfWork.Customers.GetByIdAsync(id)
+                      ?? throw new Exception("Customer not found");
+
+        customer.Name = dto.Name;
+        customer.Email = dto.Email;
+        customer.PhoneNumber = dto.Phone;
+
+        await _unitOfWork.Customers.UpdateAsync(customer);
+
+        await _unitOfWork.SaveChangesAsync();
+    }
+
+
+    public async Task UpdateAsync(Customer customer)
+    {
+        await _unitOfWork.Customers.UpdateAsync(customer);
+        await _unitOfWork.SaveChangesAsync();
+    }
+
+    public async Task<CustomerWithProfileResponse?> GetCustomerWithProfileAsync(int id)
+    {
+        var customer = await _unitOfWork.Customers.GetWithProfileAsync(id);
+        if (customer == null)
+            return null;
+
+        return new CustomerWithProfileResponse
+        {
+            Id = customer.Id,
+            Name = customer.Name,
+            Email = customer.Email,
+            PhoneNumber = customer.PhoneNumber,
+            Profile = customer.Profile is null ? null : new CustomerProfileResponse
+            {
+                Address = customer.Profile.Address,
+                PassportNumber = customer.Profile.PassportNumber,
+                DateOfBirth = customer.Profile.DateOfBirth
+            }
+        };
+
     }
 }

@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
-namespace Bank.Application.DTOs;
+namespace Bank.Application.DTOs.CreateDTOs;
 
 public record CreateAccountRequest
 {

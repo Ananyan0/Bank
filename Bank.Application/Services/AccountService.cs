@@ -1,6 +1,6 @@
-﻿using Bank.Domain.Entities;
+﻿using Bank.Application.Interfaces.IServices;
+using Bank.Domain.Entities;
 using Bank.Domain.Interfaces.IRepositories;
-using Bank.Domain.Interfaces.IServices;
 
 namespace Bank.Application.Services;
 

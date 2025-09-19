@@ -1,5 +1,5 @@
-﻿using Bank.Application.DTOs;
-using Bank.Domain.Interfaces.IServices;
+﻿using Bank.Application.DTOs.CreateDTOs;
+using Bank.Application.Interfaces.IServices;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Bank.API.Controllers;

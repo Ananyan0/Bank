@@ -1,41 +1,71 @@
-﻿using Bank.Application.DTOs;
-using Bank.Domain.Entities;
-using Bank.Domain.Interfaces.IServices;
+﻿using Bank.Application.DTOs.CreateDTOs;
+using Bank.Application.Interfaces.IServices;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Bank.API.Controllers;
-
-[Route("api/[controller]")]
-[ApiController]
-public class TransactionController : ControllerBase
+namespace Bank.API.Controllers
 {
-    private readonly ITransactionService _transactionService;
-
-    public TransactionController(ITransactionService transactionService)
+    [Route("api/[controller]")]
+    [ApiController]
+    public class TransactionController : ControllerBase
     {
-        _transactionService = transactionService;
-    }
+        private readonly ITransactionService _transactionService;
 
-    [HttpPost]
-    public async Task<IActionResult> Create([FromForm] CreateTransactionRequest request)
-    {
-        var transaction = new Transaction
+        public TransactionController(ITransactionService transactionService)
         {
-            AccountId = request.AccountId,
-            Amount = request.Amount,
-            TransactionType = request.TransactionType,
-            Timestamp = DateTime.UtcNow,
-            Description = request.Description
-        };
+            _transactionService = transactionService;
+        }
 
-        var id = await _transactionService.CreateTransactionAsync(transaction);
-        return Ok(new { TransactionId = id });
-    }
+        // POST api/transaction/deposit
+        [HttpPost("deposit")]
+        public async Task<IActionResult> Deposit([FromForm] CreateTransactionRequest request)
+        {
+            try
+            {
+                var transactionId = await _transactionService.DepositAsync(request.AccountId, request.Amount);
+                return Ok(new { TransactionId = transactionId });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
 
-    [HttpGet("{accountId}")]
-    public async Task<IActionResult> GetByAccount(int accountId)
-    {
-        var transactions = await _transactionService.GetTransactionsByAccountIdAsync(accountId);
-        return Ok(transactions);
+        // POST api/transaction/withdraw
+        [HttpPost("withdraw")]
+        public async Task<IActionResult> Withdraw([FromForm] CreateTransactionRequest request)
+        {
+            try
+            {
+                var transactionId = await _transactionService.WithdrawAsync(request.AccountId, request.Amount);
+                return Ok(new { TransactionId = transactionId });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        // POST api/transaction/transfer
+        [HttpPost("transfer")]
+        public async Task<IActionResult> Transfer([FromForm] TransferTransactionRequest request)
+        {
+            try
+            {
+                var transactionId = await _transactionService.TransferAsync(request.FromAccountId, request.ToAccountId, request.Amount);
+                return Ok(new { TransactionId = transactionId });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        // GET api/transaction/account/1
+        [HttpGet("account/{accountId}")]
+        public async Task<IActionResult> GetTransactionsByAccount(int accountId)
+        {
+            var transactions = await _transactionService.GetTransactionsByAccountAsync(accountId);
+            return Ok(transactions);
+        }
     }
 }
