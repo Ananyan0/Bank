@@ -12,7 +12,6 @@ public class CustomerProfileService : ICustomerProfileService
         _unitOfWork = unitOfWork;
     }
 
-    // Domain метод теперь использует отдельные параметры, а не DTO
     public async Task<CustomerProfile?> CreateProfileAsync(int customerId, string address, string passportNumber, DateTime dateOfBirth)
     {
         var customer = await _unitOfWork.Customers.GetByIdAsync(customerId);
@@ -39,5 +38,18 @@ public class CustomerProfileService : ICustomerProfileService
         var profile = await _unitOfWork.CustomerProfiles.FindAsync(p => p.Customer.Id == customerId);
 
         return profile;
+    }
+
+    public async Task DeleteProfileAsync(int customerId)
+    {
+        var customer = await _unitOfWork.Customers.GetByIdAsync(customerId);
+        if (customer == null)
+            throw new KeyNotFoundException("Customer not found");
+        var profile = await _unitOfWork.CustomerProfiles.FindAsync(p => p.CustomerId == customerId);
+        if (profile != null)
+        {
+            await _unitOfWork.CustomerProfiles.DeleteAsync(profile);
+            await _unitOfWork.SaveChangesAsync();
+        }
     }
 }

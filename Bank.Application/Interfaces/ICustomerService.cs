@@ -15,5 +15,6 @@ public interface ICustomerService
     Task UpdateAsync(Customer customer);
 
     Task<CustomerWithProfileResponse?> GetCustomerWithProfileAsync(int id);
+    Task DeleteAllCustomersAsync();
 
 }

@@ -130,4 +130,15 @@ public class CustomerService : ICustomerService
         };
 
     }
+
+    public async Task DeleteAllCustomersAsync()
+    {
+        var allCustomers = await _unitOfWork.Customers.GetAllAsync();
+
+        if (allCustomers.Any())
+        {
+            await _unitOfWork.Customers.RemoveRangeAsync(allCustomers);
+            await _unitOfWork.SaveChangesAsync();
+        }
+    }
 }

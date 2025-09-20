@@ -77,4 +77,14 @@ public class Repository<T> : IRepository<T> where T : EntityBase
         return await _entities.FirstOrDefaultAsync(predicate);
     }
 
+    public async Task RemoveRangeAsync(IEnumerable<Customer> customers)
+    {
+        if (customers == null || !customers.Any()) return;
+
+        await Task.Run(() =>
+        {
+            _context.Customers.RemoveRange(customers);
+        });
+    }
+
 }

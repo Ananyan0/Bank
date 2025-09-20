@@ -6,5 +6,5 @@ public interface ICustomerProfileService
 {
     Task<CustomerProfile?> CreateProfileAsync(int customerId, string address, string passportNumber, DateTime dateOfBirth);
     Task<CustomerProfile?> GetProfileByCustomerIdAsync(int customerId);
-
+    Task DeleteProfileAsync(int customerId);
 }

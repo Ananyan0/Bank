@@ -17,6 +17,8 @@ public class CustomerController : ControllerBase
         _customerService = CustomerService;
     }
 
+    
+    //Create a new customer
     [HttpPost]
     public async Task<IActionResult> CreateCustomerAsync([FromForm] CreateCustomerRequest request)
     {
@@ -30,7 +32,7 @@ public class CustomerController : ControllerBase
     }
 
 
-
+    //Get all customers
     [HttpGet]
     public async Task<ActionResult<List<Customer>>> GetAll()
     {
@@ -38,6 +40,7 @@ public class CustomerController : ControllerBase
         return Ok(customers);
     }
 
+    //Get all customers with accounts
     [HttpGet("with-accounts")]
     public async Task<ActionResult<List<Customer>>> GetCustomersWithAccounts()
     {
@@ -45,6 +48,7 @@ public class CustomerController : ControllerBase
         return Ok(customers);
     }
 
+    //Get customer by id
     [HttpGet("{id}")]
     public async Task<ActionResult<Customer>> GetById(int id)
     {
@@ -53,6 +57,8 @@ public class CustomerController : ControllerBase
         return Ok(customer);
     }
 
+
+    //Get customer with profile by id
     [HttpGet("{id}/with-profile")]
     public async Task<ActionResult<CustomerWithProfileResponse>> GetCustomerWithProfile(int id)
     {
@@ -63,6 +69,8 @@ public class CustomerController : ControllerBase
         return Ok(customer);
     }
 
+
+    //Delete customer by id
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteCustomer(int id)
     {
@@ -70,6 +78,16 @@ public class CustomerController : ControllerBase
         return Ok("success");
     }
 
+    // Delete all customers
+    [HttpDelete("Delete all customers")]
+    public async Task<IActionResult> DeleteAllCustomers()
+    {
+        await _customerService.DeleteAllCustomersAsync();
+        return Ok("success");
+    }
+    
+
+    // Update customer by id
     [HttpPut("{id}")]
     public async Task<IActionResult> UpdateCustomer(int id, [FromForm] CustomerUpdateDTO dto)
     {

@@ -1,11 +1,5 @@
 ﻿using Bank.Domain.Interfaces.IRepositories;
 using Bank.Infrastructure.Data;
-using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Bank.Infrastructure.Repositories
 {
@@ -45,7 +39,7 @@ namespace Bank.Infrastructure.Repositories
             return await _context.SaveChangesAsync();
         }
 
-        public async Task<int> CompleteAsync() // ✅ implements IUnitOfWork
+        public async Task<int> CompleteAsync() 
         {
             return await _context.SaveChangesAsync();
         }
