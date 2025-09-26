@@ -12,6 +12,7 @@ public class AppDbContext : DbContext
     public DbSet<Branch> Branches => Set<Branch>();
     public DbSet<CustomerBranch> CustomerBranches => Set<CustomerBranch>();
 
+    public DbSet<Director> Directors => Set<Director>();
 
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 

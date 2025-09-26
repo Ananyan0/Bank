@@ -1,6 +1,8 @@
-﻿using Bank.Application.DTOs;
+﻿using AutoMapper;
+using Bank.Application.DTOs;
 using Bank.Application.DTOs.ResponseDTO;
 using Bank.Application.DTOs.ResponseDTOs;
+using Bank.Application.Exceptions;
 using Bank.Application.Interfaces.IServices;
 using Bank.Domain.Entities;
 using Bank.Domain.Interfaces.IRepositories;
@@ -10,66 +12,68 @@ namespace Bank.Application.Services;
 public class CustomerService : ICustomerService
 {
     private readonly IUnitOfWork _unitOfWork;
+    private readonly IMapper _mapper;
 
-    public CustomerService(IUnitOfWork unitOfWork)
+    public CustomerService(IUnitOfWork unitOfWork, IMapper mapper)
     {
         _unitOfWork = unitOfWork;
+        _mapper = mapper;
     }
 
-    public async Task<int> CreateCustomerAsync(string name, string email, string? phone)
+    public async Task<int> CreateCustomerAsync(Customer customer)
     {
-        var customer = new Customer
-        {
-            Name = name,
-            Email = email,
-            PhoneNumber = phone
-        };
 
         await _unitOfWork.Customers.AddAsync(customer);
+        await _unitOfWork.SaveChangesAsync();
+
 
         return customer.Id;
     }
 
 
-    public async Task<List<Customer>> GetAllAsync()
+    public async Task<List<CustomerResponseDTO>> GetAllAsync()
     {
         var customers = await _unitOfWork.Customers.GetAllAsync();
+        if(customers == null)
+            throw new CustomerException("No customers found");
 
-        return customers.Select(c => new Customer
-        {
-            Id = c.Id,
-            Name = c.Name,
-            Email = c.Email,
-            PhoneNumber = c.PhoneNumber
-        }).ToList();
+        return _mapper.Map<List<CustomerResponseDTO>>(customers);
     }
 
 
-    public async Task<Customer?> GetByIdAsync(int id)
+    public async Task<Customer> GetByIdAsync(int id)
     {
-        return await _unitOfWork.Customers.GetByIdAsync(id);
+        var customer = await _unitOfWork.Customers.GetByIdAsync(id);
+
+        if (customer == null)
+            throw new CustomerException($"Customer with id {id} not found");
+
+        return customer;
     }
 
-    public async Task<List<Customer>> GetCustomersWithAccountsAsync()
+    public async Task<List<CustomerWithAccountsResponse>> GetCustomersWithAccountsAsync()
     {
         var customers = await _unitOfWork.Customers.GetAllWithIncludeAsync(c => c.Accounts);
 
-        return customers
-            .Where(c => c.Accounts.Any())
-            .Select(c => new Customer
-            {
-                Id = c.Id,
-                Name = c.Name,
-                Email = c.Email,
-                PhoneNumber = c.PhoneNumber,
-                Accounts = c.Accounts.Select(a => new Account
-                {
-                    AccountNumber = a.AccountNumber,
-                    AccountName = a.AccountName,
-                    Balance = a.Balance
-                }).ToList()
-            })
-            .ToList();
+
+        return _mapper.Map<List<CustomerWithAccountsResponse>>(customers);
+
+        //return customers
+        //    .Where(c => c.Accounts.Any())
+        //    .Select(c => new Customer
+        //    {
+        //        Id = c.Id,
+        //        Name = c.Name,
+        //        Email = c.Email,
+        //        PhoneNumber = c.PhoneNumber,
+        //        Accounts = c.Accounts.Select(a => new Account
+        //        {
+        //            AccountNumber = a.AccountNumber,
+        //            AccountName = a.AccountName,
+        //            Balance = a.Balance
+        //        }).ToList()
+        //    })
+        //    .ToList();
     }
 
 
@@ -77,7 +81,7 @@ public class CustomerService : ICustomerService
     {
         var customer = await _unitOfWork.Customers.GetByIdAsync(customerId);
         if (customer == null)
-            throw new Exception("Customer not found");
+            throw new CustomerException("Customer not found");
 
         foreach (var account in customer.Accounts)
         {

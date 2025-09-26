@@ -10,9 +10,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bank.Application", "Bank.Application\Bank.Application.csproj", "{951CD633-1BED-46F1-8490-6DDE83C3BAAD}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Domain", "Domain", "{4A2D5286-1944-40CA-B16D-B26282D53181}"
-	ProjectSection(SolutionItems) = preProject
-		Bank.Application\Services\CustomerService.cs = Bank.Application\Services\CustomerService.cs
-	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bank.Domain", "Bank.Domain\Bank.Domain.csproj", "{D1C24488-9E6C-4B66-802F-AFC53E7ED0A0}"
 EndProject

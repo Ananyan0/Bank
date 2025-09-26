@@ -1,8 +1,10 @@
-﻿using Bank.Application.DTOs;
+﻿using AutoMapper;
+using Bank.Application.DTOs;
 using Bank.Application.DTOs.ResponseDTOs;
 using Bank.Application.Interfaces.IServices;
 using Bank.Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
+using NHibernate.Mapping.ByCode.Impl;
 
 namespace Bank.API.Controllers;
 
@@ -11,50 +13,57 @@ namespace Bank.API.Controllers;
 public class CustomerController : ControllerBase
 {
     private readonly ICustomerService _customerService;
+    private readonly IMapper _mapper;
 
-    public CustomerController(ICustomerService CustomerService)
+
+    public CustomerController(ICustomerService CustomerService, IMapper mapper)
     {
         _customerService = CustomerService;
+        _mapper = mapper;
     }
 
-    
-    //Create a new customer
+
     [HttpPost]
     public async Task<IActionResult> CreateCustomerAsync([FromForm] CreateCustomerRequest request)
     {
-        var customerId = await _customerService.CreateCustomerAsync(
-            request.Name,
-            request.Email,
-            request.Phone
-        );
+        var customer = _mapper.Map<Customer>(request);
+        var customerId = await _customerService.CreateCustomerAsync(customer);
 
         return Ok(new { CustomerId = customerId });
     }
 
 
-    //Get all customers
+
     [HttpGet]
-    public async Task<ActionResult<List<Customer>>> GetAll()
+    public async Task<ActionResult<List<CustomerResponseDTO>>> GetAll()
     {
         var customers = await _customerService.GetAllAsync();
-        return Ok(customers);
+
+        var customerDtos = _mapper.Map<List<CustomerResponseDTO>>(customers);
+
+        return Ok(customerDtos);
     }
+
 
     //Get all customers with accounts
     [HttpGet("with-accounts")]
     public async Task<ActionResult<List<Customer>>> GetCustomersWithAccounts()
     {
         var customers = await _customerService.GetCustomersWithAccountsAsync();
-        return Ok(customers);
+
+        var response = _mapper.Map<List<CustomerWithAccountsResponse>>(customers);
+
+        return Ok(response);
     }
 
     //Get customer by id
-    [HttpGet("{id}")]
+    [HttpGet("{id}")] 
     public async Task<ActionResult<Customer>> GetById(int id)
     {
         var customer = await _customerService.GetByIdAsync(id);
-        if (customer == null) return NotFound();
-        return Ok(customer);
+        var response = _mapper.Map<CustomerResponseDTO>(customer);
+
+        return Ok(response);
     }
 
 
@@ -92,11 +101,9 @@ public class CustomerController : ControllerBase
     public async Task<IActionResult> UpdateCustomer(int id, [FromForm] CustomerUpdateDTO dto)
     {
         var customer = await _customerService.GetByIdAsync(id);
-        if (customer == null) return NotFound();
 
-        customer.Name = dto.Name;
-        customer.Email = dto.Email;
-        customer.PhoneNumber = dto.Phone;
+
+        _mapper.Map(dto, customer);
 
         await _customerService.UpdateAsync(customer);
 

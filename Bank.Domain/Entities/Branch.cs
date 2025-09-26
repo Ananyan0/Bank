@@ -3,7 +3,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-
 [Table("Branch")]
 public class Branch : EntityBase
 {
@@ -14,7 +13,11 @@ public class Branch : EntityBase
     [Required]
     [Column(TypeName = "nvarchar(100)")]
     public string Name { get; set; } = null!;
+    public string Address { get; set; } = null!;
+    public string Phone { get; set; } = null!;
+    public string Email { get; set; } = null!;
 
-    // Many-to-many relationship: Branch ↔ Customer
     public ICollection<CustomerBranch> CustomerBranches { get; set; } = new List<CustomerBranch>();
+
+    public Director? Director { get; set; }
 }

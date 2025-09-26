@@ -11,6 +11,7 @@ public interface IUnitOfWork : IDisposable
     IBranchRepository Branches { get; }
 
     ICustomerBranchRepository CustomerBranches { get; }
+    IDirectorRepository Directors { get; }
     Task<int> CompleteAsync(); 
     Task<int> SaveChangesAsync();
 }

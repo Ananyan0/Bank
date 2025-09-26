@@ -1,4 +1,6 @@
-﻿using Bank.Application.DTOs.ResponseDTOs;
+﻿using AutoMapper;
+using Bank.Application.DTOs.CreateDTOs;
+using Bank.Application.DTOs.ResponseDTOs;
 using Bank.Application.Interfaces.IServices;
 using Bank.Domain.Entities;
 using Bank.Domain.Interfaces.IRepositories;
@@ -6,34 +8,33 @@ using Bank.Domain.Interfaces.IRepositories;
 public class TransactionService : ITransactionService
 {
     private readonly IUnitOfWork _unitOfWork;
+    private readonly IMapper _mapper;
 
-    public TransactionService(IUnitOfWork unitOfWork)
+    public TransactionService(IUnitOfWork unitOfWork, IMapper mapper)
     {
         _unitOfWork = unitOfWork;
+        _mapper = mapper;
     }
 
-    public async Task<int> DepositAsync(int accountId, decimal amount)
+    public async Task<TransactionResponse> DepositAsync(CreateTransactionRequest request)
     {
-        var account = await _unitOfWork.Accounts.GetByIdAsync(accountId)
+        var account = await _unitOfWork.Accounts.GetByIdAsync(request.AccountId)
                       ?? throw new Exception("Account not found");
 
-        account.Balance += amount;
+        account.Balance += request.Amount;
+        await _unitOfWork.Accounts.UpdateAsync(account);
 
-        var transaction = new Transaction
-        {
-            AccountId = accountId,
-            Amount = amount,
-            Date = DateTime.UtcNow,
-            Type = "Deposit"
-        };
+
+        var transaction = _mapper.Map<Transaction>(request);
+        transaction.AccountId = account.Id;
 
         await _unitOfWork.Transactions.AddAsync(transaction);
-        await _unitOfWork.Accounts.UpdateAsync(account);
         await _unitOfWork.SaveChangesAsync();
-        
+
+        var response = _mapper.Map<TransactionResponse>(transaction);
 
 
-        return transaction.Id;
+        return response;
 
     }
 
@@ -95,27 +96,6 @@ public class TransactionService : ITransactionService
     {
         var transactions = await _unitOfWork.Transactions.GetByAccountIdAsync(accountId);
 
-        var transactionDtos = transactions.Select(t => new TransactionResponse
-        {
-            Id = t.Id,
-            Amount = t.Amount,
-            Date = t.Date,
-            Type = t.Type,
-            Account = new AccountTransResponse
-            {
-                Id = t.Account.Id,
-                AccountNumber = t.Account.AccountNumber,
-                AccountName = t.Account.AccountName,
-                Balance = t.Account.Balance
-            },
-            TargetAccount = t.TargetAccount == null ? null : new AccountTransResponse
-            {
-                Id = t.TargetAccount.Id,
-                AccountNumber = t.TargetAccount.AccountNumber,
-                AccountName = t.TargetAccount.AccountName,
-                Balance = t.TargetAccount.Balance
-            }
-        }).ToList();
-        return transactionDtos;
+        return _mapper.Map<List<TransactionResponse>>(transactions);
     }
 }

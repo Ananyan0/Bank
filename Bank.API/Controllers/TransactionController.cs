@@ -19,15 +19,10 @@ namespace Bank.API.Controllers
         [HttpPost("deposit")]
         public async Task<IActionResult> Deposit([FromForm] CreateTransactionRequest request)
         {
-            try
-            {
-                var transactionId = await _transactionService.DepositAsync(request.AccountId, request.Amount);
-                return Ok(new { TransactionId = transactionId });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+                var response = await _transactionService.DepositAsync(request);
+
+                return Ok(response);
+
         }
 
         // POST api/transaction/withdraw

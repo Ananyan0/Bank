@@ -5,7 +5,6 @@ namespace Bank.Application.DTOs.CreateDTOs;
 
 public record CreateAccountRequest
 {
-    //public decimal InitialBalance { get; set; }
     [Required]
     [DefaultValue("")]
     public string AccountName { get; set; } = string.Empty;

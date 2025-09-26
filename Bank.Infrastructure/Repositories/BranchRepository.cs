@@ -7,7 +7,7 @@ namespace Bank.Infrastructure.Repositories;
 
 public class BranchRepository : Repository<Branch>, IBranchRepository
 {
-    private readonly AppDbContext _context;
+    new private readonly AppDbContext _context;
 
     public BranchRepository(AppDbContext context) : base(context)
     {

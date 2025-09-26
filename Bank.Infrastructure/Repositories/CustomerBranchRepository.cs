@@ -2,6 +2,7 @@
 using Bank.Domain.Interfaces.IRepositories;
 using Bank.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace Bank.Infrastructure.Repositories;
 
@@ -13,24 +14,27 @@ public class CustomerBranchRepository : Repository<CustomerBranch>, ICustomerBra
 
     }
 
-    public async Task AssignCustomerToBranchAsync(int customerId, int branchId)
-    {
-        // Проверяем, нет ли уже такой связи
-        var exists = await _context.CustomerBranches
-            .AnyAsync(cb => cb.CustomerId == customerId && cb.BranchId == branchId);
+    //public async Task AssignCustomerToBranchAsync(int customerId, int branchId)
+    //{
 
-        if (!exists)
-        {
-            var customerBranch = new CustomerBranch
-            {
-                CustomerId = customerId,
-                BranchId = branchId
-            };
 
-            await _context.CustomerBranches.AddAsync(customerBranch);
-            await _context.SaveChangesAsync();
-        }
-    }
+
+
+    //    var exists = await _context.CustomerBranches
+    //        .AnyAsync(cb => cb.CustomerId == customerId && cb.BranchId == branchId);
+
+    //    if (!exists)
+    //    {
+    //        var customerBranch = new CustomerBranch
+    //        {
+    //            CustomerId = customerId,
+    //            BranchId = branchId
+    //        };
+
+    //        await _context.CustomerBranches.AddAsync(customerBranch);
+    //        await _context.SaveChangesAsync();
+    //    }
+    //}
 
     public async Task<List<Branch>> GetBranchesByCustomerAsync(int customerId)
     {
@@ -46,5 +50,11 @@ public class CustomerBranchRepository : Repository<CustomerBranch>, ICustomerBra
             .Where(cb => cb.BranchId == branchId)
             .Select(cb => cb.Customer)
             .ToListAsync();
+    }
+
+    public async Task<bool> ExistsAsync(int customerId, int branchId)
+    {
+        return await _context.CustomerBranches
+            .AnyAsync(cb => cb.CustomerId == customerId && cb.BranchId == branchId);
     }
 }

@@ -9,7 +9,7 @@ public interface IRepository<T> where T : EntityBase
     Task DeleteAsync(T entity);
 
     Task<List<T>> GetAllAsync();
-    Task<T?> GetByIdAsync(int id);
+    Task<T> GetByIdAsync(int id);
     Task<T> UpdateAsync(T entity);
     Task<List<T>> GetAllWithIncludeAsync(params Expression<Func<T, object>>[] includes);
     IQueryable<T> Query();

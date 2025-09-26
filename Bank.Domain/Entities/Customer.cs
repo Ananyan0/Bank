@@ -8,7 +8,7 @@ namespace Bank.Domain.Entities;
 public class Customer : EntityBase
 {
     [Key]
-    [DatabaseGenerated(DatabaseGeneratedOption.Identity)] // Auto-increment ID
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)] 
     public int Id { get; set; }
 
     [Required]

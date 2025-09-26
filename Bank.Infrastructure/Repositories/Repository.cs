@@ -1,8 +1,11 @@
-﻿using Bank.Domain.Entities;
+﻿using Bank.Application.Exceptions;
+using Bank.Domain.Entities;
 using Bank.Domain.Interfaces.IRepositories;
 using Bank.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
+
+
 
 namespace Bank.Infrastructure.Repositories;
 
@@ -18,12 +21,24 @@ public class Repository<T> : IRepository<T> where T : EntityBase
     }
 
 
-    public async Task<T?> GetByIdAsync(int id) =>
-        await _entities.FindAsync(id);
+    public async Task<T> GetByIdAsync(int id) 
+    {
+        var branch = await _entities.FindAsync(id);
+        if (branch == null)
+            throw new BranchException($"There is no branch with id -> {id}");
 
-    public async Task<List<T>> GetAllAsync() =>
-        await _entities.ToListAsync();
+        return branch;
+    }
 
+    public async Task<List<T>> GetAllAsync()
+    {
+        var branch = await _entities.ToListAsync();
+        if(branch == null)
+            throw new BranchException("No branches found");
+
+        return branch;
+    }
+    
     public async Task AddAsync(T entity)
     {
         await _entities.AddAsync(entity);

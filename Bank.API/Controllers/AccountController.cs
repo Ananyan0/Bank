@@ -1,5 +1,7 @@
-﻿using Bank.Application.DTOs.CreateDTOs;
+﻿using AutoMapper;
+using Bank.Application.DTOs.CreateDTOs;
 using Bank.Application.Interfaces.IServices;
+using Bank.Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Bank.API.Controllers;
@@ -9,10 +11,12 @@ namespace Bank.API.Controllers;
 public class AccountController : ControllerBase
 {
     private readonly IAccountService _accountService;
+    private readonly IMapper _mapper;
 
-    public AccountController(IAccountService _accountService)
+    public AccountController(IAccountService _accountService, IMapper mapper)
     {
         this._accountService = _accountService;
+        _mapper = mapper;
     }
 
 
@@ -20,23 +24,24 @@ public class AccountController : ControllerBase
     [HttpPost("{customerId}/accounts")]
     public async Task<IActionResult> CreateAccountAsync(int customerId, [FromForm] CreateAccountRequest request)
     {
-        var accountId = await _accountService.CreateAccountForCustomerAsync(customerId, request.AccountName);
-        return Ok(new { AccountId = accountId });
+        var accountId = await _accountService.CreateAccountForCustomerAsync(customerId, request);
+
+        var response = _mapper.Map<AccountResponseDto>(accountId);
+
+
+        return Ok(response);
     }
 
     // Delete an account by its ID
     [HttpDelete("accounts/{accountId}")]
     public async Task<IActionResult> DeleteAccountAsync(int accountId)
     {
-        try
-        {
-            await _accountService.DeleteAccountAsync(accountId);
-            return NoContent();
-        }
-        catch (KeyNotFoundException)
-        {
-            return NotFound($"Account with Id {accountId} not found.");
-        }
+
+        var account = await _accountService.GetByIdAsync(accountId);
+
+        await _accountService.DeleteAccountAsync(accountId);
+
+        return Ok($"Success Account with Id -> {accountId} has been deleted.");
     }
 
     // Get all accounts

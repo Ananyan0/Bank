@@ -12,9 +12,10 @@ namespace Bank.Infrastructure.Repositories
         private readonly Lazy<ICustomerProfileRepository> _customerprofileRepository;
         private readonly Lazy<IBranchRepository> _branchRepository;
         private readonly Lazy<ICustomerBranchRepository> _customerBranchRepository;
+        private readonly Lazy<IDirectorRepository> _directorRepository;
 
 
-        public UnitOfWork(AppDbContext context, Lazy<ICustomerRepository> customerRepository, Lazy<IAccountRepository> accountRepository, Lazy<ITransactionRepository> transactionRepository, Lazy<ICustomerProfileRepository> customerprofileRepository, Lazy<IBranchRepository> branchRepository, Lazy<ICustomerBranchRepository> customerBranchRepository)
+        public UnitOfWork(AppDbContext context, Lazy<IDirectorRepository> directorRepository, Lazy<ICustomerRepository> customerRepository, Lazy<IAccountRepository> accountRepository, Lazy<ITransactionRepository> transactionRepository, Lazy<ICustomerProfileRepository> customerprofileRepository, Lazy<IBranchRepository> branchRepository, Lazy<ICustomerBranchRepository> customerBranchRepository)
         {
             _context = context;
 
@@ -24,6 +25,7 @@ namespace Bank.Infrastructure.Repositories
             _customerprofileRepository = customerprofileRepository;
             _branchRepository = branchRepository;
             _customerBranchRepository = customerBranchRepository;
+            _directorRepository = directorRepository;
         }
 
         public ICustomerRepository Customers => _customerRepository.Value;
@@ -32,6 +34,7 @@ namespace Bank.Infrastructure.Repositories
         public ICustomerProfileRepository CustomerProfiles => _customerprofileRepository.Value;
         public IBranchRepository Branches => _branchRepository.Value;
         public ICustomerBranchRepository CustomerBranches => _customerBranchRepository.Value;
+        public IDirectorRepository Directors => _directorRepository.Value;
 
 
         public async Task<int> SaveChangesAsync()

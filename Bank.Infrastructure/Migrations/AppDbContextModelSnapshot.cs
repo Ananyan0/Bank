@@ -59,9 +59,21 @@ namespace Bank.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("Address")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("Phone")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -143,6 +155,38 @@ namespace Bank.Infrastructure.Migrations
                     b.ToTable("CustomerProfile");
                 });
 
+            modelBuilder.Entity("Bank.Domain.Entities.Director", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("BranchId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("PhoneNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BranchId")
+                        .IsUnique();
+
+                    b.ToTable("Directors");
+                });
+
             modelBuilder.Entity("Bank.Domain.Entities.Transaction", b =>
                 {
                     b.Property<int>("Id")
@@ -217,6 +261,17 @@ namespace Bank.Infrastructure.Migrations
                     b.Navigation("Customer");
                 });
 
+            modelBuilder.Entity("Bank.Domain.Entities.Director", b =>
+                {
+                    b.HasOne("Bank.Domain.Entities.Branch", "Branch")
+                        .WithOne("Director")
+                        .HasForeignKey("Bank.Domain.Entities.Director", "BranchId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Branch");
+                });
+
             modelBuilder.Entity("Bank.Domain.Entities.Transaction", b =>
                 {
                     b.HasOne("Bank.Domain.Entities.Account", "Account")
@@ -243,6 +298,8 @@ namespace Bank.Infrastructure.Migrations
             modelBuilder.Entity("Bank.Domain.Entities.Branch", b =>
                 {
                     b.Navigation("CustomerBranches");
+
+                    b.Navigation("Director");
                 });
 
             modelBuilder.Entity("Bank.Domain.Entities.Customer", b =>

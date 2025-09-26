@@ -1,4 +1,7 @@
-﻿using Bank.Application.Interfaces.IServices;
+﻿using AutoMapper;
+using Bank.Application.DTOs.CreateDTOs;
+using Bank.Application.DTOs.ResponseDTOs;
+using Bank.Application.Interfaces.IServices;
 using Bank.Application.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,39 +12,42 @@ namespace Bank.API.Controllers;
 public class CustomerBranchController : ControllerBase
 {
     private readonly ICustomerBranchService _customerBranchService;
+    private readonly IMapper _mapper;
 
-    public CustomerBranchController(ICustomerBranchService customerBranchService)
+    public CustomerBranchController(ICustomerBranchService customerBranchService, IMapper mapper)
     {
         _customerBranchService = customerBranchService;
+        _mapper = mapper;
     }
 
-    /// <summary>
-    /// Привязать клиента к филиалу (создать связь M:N)
-    /// </summary>
+
     [HttpPost("assign")]
-    public async Task<IActionResult> AssignCustomerToBranch(int customerId, int branchId)
+    public async Task<IActionResult> AssignCustomerToBranch([FromForm] AssignCustomerToBranchRequest request)
     {
-        await _customerBranchService.AssignCustomerToBranchAsync(customerId, branchId);
-        return Ok(new { Message = $"Customer {customerId} assigned to Branch {branchId}" });
+        await _customerBranchService.AssignCustomerToBranchAsync(request.CustomerId, request.BranchId);
+
+        return Ok(new { Message = $"Customer {request.CustomerId} assigned to Branch {request.BranchId}" });
     }
 
-    /// <summary>
-    /// Получить список филиалов клиента
-    /// </summary>
+
     [HttpGet("customer/{customerId}/branches")]
     public async Task<IActionResult> GetBranchesByCustomer(int customerId)
     {
         var branches = await _customerBranchService.GetBranchesByCustomerAsync(customerId);
-        return Ok(branches);
+
+        var response = _mapper.Map<List<BranchResponseDto>>(branches);
+
+        return Ok(response);
     }
 
-    /// <summary>
-    /// Получить список клиентов в филиале
-    /// </summary>
+    
     [HttpGet("branch/{branchId}/customers")]
     public async Task<IActionResult> GetCustomersByBranch(int branchId)
     {
         var customers = await _customerBranchService.GetCustomersByBranchAsync(branchId);
-        return Ok(customers);
+
+        var response = _mapper.Map<List<CustomerResponseDTO>>(customers);
+
+        return Ok(response);
     }
 }

@@ -1,6 +1,7 @@
-﻿using Bank.Application.DTOs.CreateDTOs;
+﻿using AutoMapper;
+using Bank.Application.DTOs;
+using Bank.Application.DTOs.CreateDTOs;
 using Bank.Application.DTOs.ResponseDTOs;
-using Bank.Application.Interfaces;
 using Bank.Domain.Entities;
 using Bank.Domain.Interfaces.IRepositories;
 using Microsoft.AspNetCore.Mvc;
@@ -12,96 +13,77 @@ namespace Bank.API.Controllers;
 public class BranchController : ControllerBase
 {
     private readonly IUnitOfWork _unitOfWork;
+    private readonly IMapper _mapper;
 
-    public BranchController(IUnitOfWork unitOfWork)
+    public BranchController(IUnitOfWork unitOfWork, IMapper mapper)
     {
         _unitOfWork = unitOfWork;
+        _mapper = mapper;
     }
 
-    /// <summary>
     /// Get all branches
-    /// </summary>
-    [HttpGet]
+    [HttpGet("Get all branches")]
     public async Task<IActionResult> GetAll()
     {
         var branches = await _unitOfWork.Branches.GetAllAsync();
-        return Ok(branches.Select(b => new BranchResponse
-        {
-            Id = b.Id,
-            Name = b.Name
-        }));
+
+        var response = _mapper.Map<List<BranchResponseDto>>(branches);
+
+        return Ok(response);
     }
 
-    /// <summary>
     /// Get branch by id
-    /// </summary>
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById(int id)
     {
         var branch = await _unitOfWork.Branches.GetByIdAsync(id);
-        if (branch == null) return NotFound();
 
-        return Ok(new BranchResponse
-        {
-            Id = branch.Id,
-            Name = branch.Name
-        });
+        await _unitOfWork.CompleteAsync();
+
+        var response = _mapper.Map<BranchResponseDto>(branch);
+
+        return Ok(response);
     }
 
-    /// <summary>
     /// Create a new branch
-    /// </summary>
     [HttpPost]
-    public async Task<IActionResult> Create(CreateBranchRequest request)
+    public async Task<IActionResult> Create([FromForm] CreateBranchRequest request)
     {
-        var branch = new Branch
-        {
-            Name = request.Name
-        };
+        var branch = _mapper.Map<Branch>(request);
 
         await _unitOfWork.Branches.AddAsync(branch);
         await _unitOfWork.CompleteAsync();
 
-        return Ok(new BranchResponse
-        {
-            Id = branch.Id,
-            Name = branch.Name
-        });
+        var response = _mapper.Map<BranchResponseDto>(branch);
+
+        return Ok(response);
     }
 
-    /// <summary>
     /// Update a branch
-    /// </summary>
     [HttpPut("{id}")]
-    public async Task<IActionResult> Update(int id, CreateBranchRequest request)
+    public async Task<IActionResult> Update(int id, [FromForm] BranchUpdateDto update)
     {
         var branch = await _unitOfWork.Branches.GetByIdAsync(id);
-        if (branch == null) return NotFound();
 
-        branch.Name = request.Name;
+        _mapper.Map(update, branch);
 
         await _unitOfWork.Branches.UpdateAsync(branch);
         await _unitOfWork.CompleteAsync();
 
-        return Ok(new BranchResponse
-        {
-            Id = branch.Id,
-            Name = branch.Name
-        });
+        var respoonse = _mapper.Map<BranchResponseDto>(branch);
+        
+        return Ok(respoonse);
     }
 
-    /// <summary>
     /// Delete a branch
-    /// </summary>
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
     {
         var branch = await _unitOfWork.Branches.GetByIdAsync(id);
-        if (branch == null) return NotFound();
 
         await _unitOfWork.Branches.DeleteAsync(branch);
         await _unitOfWork.CompleteAsync();
 
-        return NoContent();
+        return Ok($"Success Branch with Id -> {branch.Id} has been deleted.");
     }
 }

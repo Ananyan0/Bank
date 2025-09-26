@@ -5,11 +5,10 @@ namespace Bank.Application.Interfaces.IServices;
 
 public interface ICustomerService
 {
-    //Task<int> CreateCustomerAsync(string customerName);
-    Task<int> CreateCustomerAsync(string customerName, string email, string? phone);
-    Task<List<Customer>> GetAllAsync();
-    Task<Customer?> GetByIdAsync(int id);
-    Task<List<Customer>> GetCustomersWithAccountsAsync();
+    Task<int> CreateCustomerAsync(Customer customer);
+    Task<List<CustomerResponseDTO>> GetAllAsync();
+    Task<Customer> GetByIdAsync(int id);
+    Task<List<CustomerWithAccountsResponse>> GetCustomersWithAccountsAsync();
     Task DeleteCustomerAsync(int id);
 
     Task UpdateAsync(Customer customer);
