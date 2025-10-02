@@ -1,5 +1,6 @@
 ﻿using Bank.Application.DTOs.CreateDTOs;
 using Bank.Application.Interfaces.IServices;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Bank.API.Controllers
@@ -16,6 +17,7 @@ namespace Bank.API.Controllers
         }
 
         // POST api/transaction/deposit
+        [Authorize(Roles = "Admin, User")]
         [HttpPost("deposit")]
         public async Task<IActionResult> Deposit([FromForm] CreateTransactionRequest request)
         {
@@ -26,6 +28,7 @@ namespace Bank.API.Controllers
         }
 
         // POST api/transaction/withdraw
+        [Authorize(Roles = "Admin, User")]
         [HttpPost("withdraw")]
         public async Task<IActionResult> Withdraw([FromForm] CreateTransactionRequest request)
         {
@@ -41,6 +44,7 @@ namespace Bank.API.Controllers
         }
 
         // POST api/transaction/transfer
+        [Authorize(Roles = "Admin, User")]
         [HttpPost("transfer")]
         public async Task<IActionResult> Transfer([FromForm] TransferTransactionRequest request)
         {
@@ -56,6 +60,7 @@ namespace Bank.API.Controllers
         }
 
         // GET api/transaction/account/1
+        [Authorize(Roles = "Admin, User")]
         [HttpGet("account/{accountId}")]
         public async Task<IActionResult> GetTransactionsByAccount(int accountId)
         {

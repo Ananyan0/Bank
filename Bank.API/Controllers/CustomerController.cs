@@ -3,6 +3,7 @@ using Bank.Application.DTOs;
 using Bank.Application.DTOs.ResponseDTOs;
 using Bank.Application.Interfaces.IServices;
 using Bank.Domain.Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NHibernate.Mapping.ByCode.Impl;
 
@@ -23,6 +24,7 @@ public class CustomerController : ControllerBase
     }
 
 
+    [Authorize(Roles = "Admin")]
     [HttpPost]
     public async Task<IActionResult> CreateCustomerAsync([FromForm] CreateCustomerRequest request)
     {
@@ -33,11 +35,12 @@ public class CustomerController : ControllerBase
     }
 
 
-
+    [Authorize(Roles = "Admin")]
     [HttpGet]
     public async Task<ActionResult<List<CustomerResponseDTO>>> GetAll()
     {
         var customers = await _customerService.GetAllAsync();
+
 
         var customerDtos = _mapper.Map<List<CustomerResponseDTO>>(customers);
 
@@ -46,6 +49,7 @@ public class CustomerController : ControllerBase
 
 
     //Get all customers with accounts
+    [Authorize(Roles = "Admin")]
     [HttpGet("with-accounts")]
     public async Task<ActionResult<List<Customer>>> GetCustomersWithAccounts()
     {
@@ -57,6 +61,7 @@ public class CustomerController : ControllerBase
     }
 
     //Get customer by id
+    [Authorize(Roles = "Admin")]
     [HttpGet("{id}")] 
     public async Task<ActionResult<Customer>> GetById(int id)
     {
@@ -68,6 +73,7 @@ public class CustomerController : ControllerBase
 
 
     //Get customer with profile by id
+    [Authorize(Roles = "Admin")]
     [HttpGet("{id}/with-profile")]
     public async Task<ActionResult<CustomerWithProfileResponse>> GetCustomerWithProfile(int id)
     {
@@ -80,6 +86,7 @@ public class CustomerController : ControllerBase
 
 
     //Delete customer by id
+    [Authorize(Roles = "Admin")]
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteCustomer(int id)
     {
@@ -88,15 +95,17 @@ public class CustomerController : ControllerBase
     }
 
     // Delete all customers
+    [Authorize(Roles = "Admin")]
     [HttpDelete("Delete all customers")]
     public async Task<IActionResult> DeleteAllCustomers()
     {
         await _customerService.DeleteAllCustomersAsync();
         return Ok("success");
     }
-    
+
 
     // Update customer by id
+    [Authorize(Roles = "Admin")]
     [HttpPut("{id}")]
     public async Task<IActionResult> UpdateCustomer(int id, [FromForm] CustomerUpdateDTO dto)
     {

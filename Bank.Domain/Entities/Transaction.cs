@@ -19,17 +19,15 @@ public class Transaction : EntityBase
 
     [Required]
     [Column(TypeName = "varchar(20)")]
-    public string Type { get; set; } = null!; // Deposit, Withdraw, Transfer
+    public string Type { get; set; } = null!; 
 
-    // Foreign key to Account
     [Required]
     public int AccountId { get; set; }
 
     [ForeignKey("AccountId")]
-    [JsonIgnore] // prevent cycles in JSON serialization
+    [JsonIgnore] 
     public Account Account { get; set; } = null!;
 
-    // Optional foreign key to TargetAccount for transfers
     public int? TargetAccountId { get; set; }
 
     [ForeignKey("TargetAccountId")]

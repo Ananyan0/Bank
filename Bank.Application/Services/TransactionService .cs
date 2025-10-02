@@ -10,6 +10,10 @@ public class TransactionService : ITransactionService
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
 
+    public TransactionService(IUnitOfWork unitOfWork)
+    {
+    }
+
     public TransactionService(IUnitOfWork unitOfWork, IMapper mapper)
     {
         _unitOfWork = unitOfWork;

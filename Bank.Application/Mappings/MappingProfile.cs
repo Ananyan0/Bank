@@ -24,11 +24,22 @@ namespace Bank.Application.Mappings
 
             CreateMap<Account, AccountResponseDto>();
 
-            CreateMap<Director, DirectorResponseDto>();
+            CreateMap<Director, DirectorResponseDto>()
+                    .ForMember(dest => dest.Email, opt => opt.MapFrom(src =>
+                        src.Email.Contains("@") ? src.Email : src.PhoneNumber)) 
+                    .ForMember(dest => dest.PhoneNumber, opt => opt.MapFrom(src =>
+                        src.PhoneNumber.All(char.IsDigit) ? src.PhoneNumber : src.Email));
+
             CreateMap<CreateDirectorRequest, Director>();
 
-            CreateMap<CreateTransactionRequest, Transaction>();
+            CreateMap<CreateTransactionRequest, Transaction>()
+                    .ForMember(dest => dest.Type, opt => opt.MapFrom(src => "Deposit"));
+
+
             CreateMap<Transaction, TransactionResponse>();
+            CreateMap<Account, AccountTransResponse>();
+
+
 
             CreateMap<Customer, List<CustomerResponseDTO>>();
 

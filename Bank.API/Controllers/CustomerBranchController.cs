@@ -3,6 +3,7 @@ using Bank.Application.DTOs.CreateDTOs;
 using Bank.Application.DTOs.ResponseDTOs;
 using Bank.Application.Interfaces.IServices;
 using Bank.Application.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Bank.API.Controllers;
@@ -21,6 +22,7 @@ public class CustomerBranchController : ControllerBase
     }
 
 
+    [Authorize(Roles = "Admin")]
     [HttpPost("assign")]
     public async Task<IActionResult> AssignCustomerToBranch([FromForm] AssignCustomerToBranchRequest request)
     {
@@ -30,6 +32,8 @@ public class CustomerBranchController : ControllerBase
     }
 
 
+
+    [Authorize(Roles = "Admin")]
     [HttpGet("customer/{customerId}/branches")]
     public async Task<IActionResult> GetBranchesByCustomer(int customerId)
     {
@@ -40,7 +44,8 @@ public class CustomerBranchController : ControllerBase
         return Ok(response);
     }
 
-    
+
+    [Authorize(Roles = "Admin")]
     [HttpGet("branch/{branchId}/customers")]
     public async Task<IActionResult> GetCustomersByBranch(int branchId)
     {

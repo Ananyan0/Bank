@@ -2,6 +2,7 @@
 using Bank.Application.DTOs.CreateDTOs;
 using Bank.Application.Interfaces.IServices;
 using Bank.Domain.Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Bank.API.Controllers;
@@ -21,6 +22,7 @@ public class AccountController : ControllerBase
 
 
     // Create a new account for a specific customer
+    [Authorize(Roles = "Admin")]
     [HttpPost("{customerId}/accounts")]
     public async Task<IActionResult> CreateAccountAsync(int customerId, [FromForm] CreateAccountRequest request)
     {
@@ -33,6 +35,7 @@ public class AccountController : ControllerBase
     }
 
     // Delete an account by its ID
+    [Authorize(Roles = "Admin")]
     [HttpDelete("accounts/{accountId}")]
     public async Task<IActionResult> DeleteAccountAsync(int accountId)
     {
@@ -46,6 +49,7 @@ public class AccountController : ControllerBase
 
     // Get all accounts
     [HttpGet("accounts")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> GetAllAccountsAsync()
     {
         var accounts = await _accountService.GetAllAsync();

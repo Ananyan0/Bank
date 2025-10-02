@@ -1,4 +1,5 @@
-﻿using Bank.Domain.Entities;
+﻿using Bank.Application.Exceptions;
+using Bank.Domain.Entities;
 using Bank.Domain.Interfaces.IRepositories;
 using Bank.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
@@ -14,20 +15,20 @@ public class CustomerRepository : Repository<Customer>, ICustomerRepository
         //_context = context;
     }
 
-    //public async Task<Customer> GetByIdAsync(int id)
-    //    => await _context.Customers.FindAsync(id);
+    public async Task<Customer?> GetByEmailAsync(string email)
+    {
+        var customerEmail = await _context.Customers
+            .FirstOrDefaultAsync(c => c.Email == email);
+        
 
-    //public async Task<List<Customer>> GetAllAsync()
-    //    => await _context.Customers.Include(c => c.Accounts).ToListAsync();
-    //public async Task AddAsync(Customer customer)
-    //{
-    //    _context.Customers.Add(customer);
-    //    await _context.SaveChangesAsync();
-    //}
+        return customerEmail;
+    }
 
-    //public async Task DeleteCustomerAsync(Customer customer)
-    //{
-    //    _context.Customers.Remove(customer);
-    //    await _context.SaveChangesAsync();
-    //}
+    public async Task<Customer?> GetByPhoneAsync(string phone)
+    {
+        var customerPhone = await _context.Customers
+            .FirstOrDefaultAsync(c => c.Phone == phone);
+
+        return customerPhone;
+    }
 }

@@ -1,10 +1,13 @@
 ﻿using Bank.Domain.Entities;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace Bank.Infrastructure.Data;
 
 public class AppDbContext : DbContext
 {
+
     public DbSet<Customer> Customers => Set<Customer>();
     public DbSet<Account> Accounts => Set<Account>();
     public DbSet<Transaction> Transactions => Set<Transaction>();
@@ -67,7 +70,7 @@ public class AppDbContext : DbContext
             .IsRequired();
 
         modelBuilder.Entity<Customer>()
-            .Property(c => c.Name)
+            .Property(c => c.FirstName)
             .IsRequired();
 
         modelBuilder.Entity<Account>()

@@ -36,8 +36,8 @@ namespace Bank.API.Middlewares
                 {
                     CustomerException => StatusCodes.Status404NotFound,
                     AccountException => StatusCodes.Status404NotFound,
-                    BranchException bex => bex.StatusCode,
-                    _ => StatusCodes.Status500InternalServerError
+                    BranchException bex => bex.StatusCode
+                    //_ => StatusCodes.Status500InternalServerError
                 };
 
                 context.Response.StatusCode = statusCode;

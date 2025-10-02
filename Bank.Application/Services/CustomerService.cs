@@ -22,6 +22,13 @@ public class CustomerService : ICustomerService
 
     public async Task<int> CreateCustomerAsync(Customer customer)
     {
+        var isEmailTaken = await _unitOfWork.Customers.GetByEmailAsync(customer.Email);
+        if(isEmailTaken != null)
+            throw new CustomerException($"Email {customer.Email} is already taken");
+
+        var isPhoneTaken = await _unitOfWork.Customers.GetByPhoneAsync(customer.Phone);
+        if(isPhoneTaken != null)
+            throw new CustomerException($"Phone number {customer.Phone} is already taken");
 
         await _unitOfWork.Customers.AddAsync(customer);
         await _unitOfWork.SaveChangesAsync();
@@ -97,9 +104,10 @@ public class CustomerService : ICustomerService
         var customer = await _unitOfWork.Customers.GetByIdAsync(id)
                       ?? throw new Exception("Customer not found");
 
-        customer.Name = dto.Name;
+        customer.FirstName = dto.FirstName;
+        customer.LastName = dto.LastName;
         customer.Email = dto.Email;
-        customer.PhoneNumber = dto.Phone;
+        customer.Phone = dto.Phone;
 
         await _unitOfWork.Customers.UpdateAsync(customer);
 
@@ -122,9 +130,10 @@ public class CustomerService : ICustomerService
         return new CustomerWithProfileResponse
         {
             Id = customer.Id,
-            Name = customer.Name,
+            FirstName = customer.FirstName,
+            LastName = customer.LastName,
             Email = customer.Email,
-            PhoneNumber = customer.PhoneNumber,
+            PhoneNumber = customer.Phone,
             Profile = customer.Profile is null ? null : new CustomerProfileResponse
             {
                 Address = customer.Profile.Address,

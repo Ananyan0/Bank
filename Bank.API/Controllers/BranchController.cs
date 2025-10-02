@@ -4,6 +4,7 @@ using Bank.Application.DTOs.CreateDTOs;
 using Bank.Application.DTOs.ResponseDTOs;
 using Bank.Domain.Entities;
 using Bank.Domain.Interfaces.IRepositories;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Bank.API.Controllers;
@@ -22,6 +23,7 @@ public class BranchController : ControllerBase
     }
 
     /// Get all branches
+    [Authorize(Roles = "Admin")]
     [HttpGet("Get all branches")]
     public async Task<IActionResult> GetAll()
     {
@@ -33,6 +35,7 @@ public class BranchController : ControllerBase
     }
 
     /// Get branch by id
+    [Authorize(Roles = "Admin")]
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById(int id)
     {
@@ -46,6 +49,8 @@ public class BranchController : ControllerBase
     }
 
     /// Create a new branch
+    /// 
+    [Authorize(Roles = "Admin")]
     [HttpPost]
     public async Task<IActionResult> Create([FromForm] CreateBranchRequest request)
     {
@@ -60,6 +65,8 @@ public class BranchController : ControllerBase
     }
 
     /// Update a branch
+    /// 
+    [Authorize(Roles = "Admin")]
     [HttpPut("{id}")]
     public async Task<IActionResult> Update(int id, [FromForm] BranchUpdateDto update)
     {
@@ -76,6 +83,8 @@ public class BranchController : ControllerBase
     }
 
     /// Delete a branch
+    /// 
+    [Authorize(Roles = "Admin")]
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
     {

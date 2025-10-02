@@ -2,6 +2,7 @@
 using Bank.Application.DTOs;
 using Bank.Application.Interfaces.IServices;
 using Bank.Domain.Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
@@ -18,6 +19,7 @@ public class CustomerProfileController : ControllerBase
     }
 
 
+    [Authorize(Roles = "Admin")]
     [HttpPost("Create profile")]
     public async Task<ActionResult<CustomerProfile>> Create([FromForm] CreateCustomerProfileRequest request)
     {
@@ -27,6 +29,7 @@ public class CustomerProfileController : ControllerBase
     }
 
 
+    [Authorize(Roles = "Admin")]
     [HttpDelete("{customerId}")]
     public async Task<IActionResult> Delete(int customerId)
     {

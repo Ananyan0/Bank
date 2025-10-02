@@ -2,6 +2,7 @@
 using Bank.Domain.Entities;
 using Bank.Domain.Interfaces.IRepositories;
 using Bank.Infrastructure.Data;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
