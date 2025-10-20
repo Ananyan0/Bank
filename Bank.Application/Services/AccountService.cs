@@ -5,23 +5,23 @@ using Bank.Application.HelperExtensions;
 using Bank.Application.Interfaces.IServices;
 using Bank.Domain.Entities;
 using Bank.Domain.Interfaces.IRepositories;
+using System.Text;
+using System.Text.Json;
 
 namespace Bank.Application.Services;
 
 public class AccountService : IAccountService
 {
     private readonly IUnitOfWork _unitOfWork;
+    private readonly IHttpClientFactory _httpClientFactory;
     private readonly IMapper _mapper;
 
-    //public AccountService(IUnitOfWork unitOfWork)
-    //{
-    //    _unitOfWork = unitOfWork;
-    //}
 
-    public AccountService(IUnitOfWork unitOfWork, IMapper mapper)
+    public AccountService(IUnitOfWork unitOfWork, IMapper mapper, IHttpClientFactory httpClientFactory)
     {
         _unitOfWork = unitOfWork;
         _mapper = mapper;
+        _httpClientFactory = httpClientFactory;
     }
 
     public async Task<int> CreateAccountAsync(int customerId, decimal initialBalance)
@@ -57,6 +57,18 @@ public class AccountService : IAccountService
         var account = await _unitOfWork.Accounts.GetByIdAsync(id);
         if (account == null)
             throw new AccountException($"There is no account with id -> {id}");
+
+        if (account.Balance < 500)
+        {
+            var client = _httpClientFactory.CreateClient();
+            var content = new StringContent(
+                JsonSerializer.Serialize(new { accountId = account.Id, balance = account.Balance }),
+                Encoding.UTF8, "application/json");
+
+                var response = await client.PostAsync("http://localhost:5217/api/accountnotification/notify", content);
+                Console.WriteLine($"POST status: {response.StatusCode}");
+                response.EnsureSuccessStatusCode();
+        }
 
         return account;
     }
