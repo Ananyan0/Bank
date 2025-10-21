@@ -2,6 +2,7 @@
 using Bank.Application.DTOs;
 using Bank.Application.DTOs.CreateDTOs;
 using Bank.Application.DTOs.ResponseDTOs;
+using Bank.Application.Interfaces;
 using Bank.Domain.Entities;
 using Bank.Domain.Interfaces.IRepositories;
 using Microsoft.AspNetCore.Authorization;
@@ -14,12 +15,14 @@ namespace Bank.API.Controllers;
 public class BranchController : ControllerBase
 {
     private readonly IUnitOfWork _unitOfWork;
+    private readonly IBranchService _branchService;
     private readonly IMapper _mapper;
 
-    public BranchController(IUnitOfWork unitOfWork, IMapper mapper)
+    public BranchController(IMapper mapper, IBranchService branchService, IUnitOfWork unitOfWork)
     {
-        _unitOfWork = unitOfWork;
         _mapper = mapper;
+        _branchService = branchService;
+        _unitOfWork = unitOfWork;
     }
 
     /// Get all branches
@@ -27,7 +30,7 @@ public class BranchController : ControllerBase
     [HttpGet("Get all branches")]
     public async Task<IActionResult> GetAll()
     {
-        var branches = await _unitOfWork.Branches.GetAllAsync();
+        var branches = await _branchService.GetAllAsync();
 
         var response = _mapper.Map<List<BranchResponseDto>>(branches);
 
