@@ -2,8 +2,10 @@
 using Bank.Application;
 using Bank.Application.Interfaces;
 using Bank.Application.Interfaces.IServices;
+using Bank.Application.Interfaces.MessagingInterface;
 using Bank.Application.Mappings;
 using Bank.Application.Services;
+using Bank.Application.Services.MessagingService;
 using Bank.Domain.Entities;
 using Bank.Domain.Interfaces.IRepositories;
 using Bank.Infrastructure;
@@ -72,6 +74,9 @@ builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+
+builder.Services.AddSingleton<IRequestPublisher, RabbitPublisher>();
+builder.Services.AddScoped<IExchangeRequestService, ExchangeRequestService>();
 builder.Services.AddScoped<ICacheService, RedisCacheService>();
 builder.Services.AddScoped<IBranchService, BranchService>();
 builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
@@ -127,6 +132,17 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll",
+        policy =>
+        {
+            policy
+                .AllowAnyOrigin()
+                .AllowAnyMethod()
+                .AllowAnyHeader();
+        });
+});
 
 builder.Services.AddHttpClient();
 
@@ -152,6 +168,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseCors("AllowAll"); // 🟢 Enable here
 
 
 
